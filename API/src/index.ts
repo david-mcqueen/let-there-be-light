@@ -1,3 +1,5 @@
+"use strict";
+
 import express from 'express';
 import Commands from './commands';
 import bodyParser from 'body-parser';
@@ -11,6 +13,10 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 app.listen(3000, () => {
  console.log("Server running on port 3000");
 });
+
+app.get("/test", (req, res, next) => {
+    res.json({success: true});
+})
 
 app.post("/sleep", (req, res, next) => {
     Commands.startSleep()
