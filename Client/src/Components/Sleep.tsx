@@ -1,9 +1,11 @@
 import React from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
+import ApiService from '../service/ApiService';
 
 function Schedule() {
 
+    const api = new ApiService()
 
     return (
         <div className="slider">
@@ -13,7 +15,7 @@ function Schedule() {
                     <Card.Text>
                     Turn off the lights over 30 minutes
                     </Card.Text>
-                    <Button variant="primary">Sleep</Button>
+                    <Button variant="success" block onClick={() => api.sleep()}>Sleep</Button>
                 </Card.Body>
                 </Card>
         </div>
