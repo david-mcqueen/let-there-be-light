@@ -11,18 +11,19 @@ epochDelay = sec / maxvalue
 
 print(epochDelay)
 
-for i in range(0, maxvalue, 1):
+for i in range(maxvalue - 1, 0, -1):
 	subprocess.check_call(['pigs', 'p 17', str(i)])
 	if i > midpoint:
 		cwValue = (i - midpoint) * 2
 		subprocess.check_call(['pigs', 'p 22', str(cwValue)])
 		print(str(cwValue))
+	else:
+		subprocess.check_call(['pigs', 'p 22', str(0)])
 
 	print(str(i))
 	time.sleep(epochDelay)
 
-subprocess.check_call(['pigs', 'p 17', str(255)])
-subprocess.check_call(['pigs', 'p 22', str(255)])
+subprocess.check_call(['pigs', 'p 17', str(0)])
 elapsed_time = time.time() - start_time
 print(str(elapsed_time))
 print("done")

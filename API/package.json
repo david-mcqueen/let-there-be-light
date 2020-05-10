@@ -4,7 +4,7 @@
   "description": "api for raspberry controlled sunlight",
   "main": "src/index.ts",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack && scp -r ../Scripts ./build",
     "build-prod": "webpack --mode=production --display-error-details",
     "deploy": "scp -r ./build/ pi@192.168.1.104:~/sunrise-lamp",
     "build-deploy": "npm run-script build && npm run-script deploy"

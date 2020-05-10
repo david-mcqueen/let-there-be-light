@@ -26,13 +26,13 @@ class Commands {
         }
 
         Commands.scheduledTask = cron.schedule(cronExpression, () => {
-            exec.exec('python ./lamp-on.py', (err: any, stdout: any, stderr: any) => {
+            exec.exec('python ./Scripts/light-on.py', (err: any, stdout: any, stderr: any) => {
                 if (err) {
                     console.log("something went wrong");
-                    console.log(err)
+                    console.log(err);
                 }else {
-                    console.log(stderr)
-                    console.log(stdout)
+                    console.log(stderr);
+                    console.log(stdout);
                 }
             })
         });
@@ -50,6 +50,7 @@ class Commands {
                 }else {
                     console.log(stderr)
                     console.log(stdout)
+                    resolve();
                 }
             })
 

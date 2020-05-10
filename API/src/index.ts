@@ -36,8 +36,16 @@ app.post("/setSchedule", (req, res, next) => {
         return;
     }
 
-    Commands.setAlarmSchedule('* * * * *');
-    res.json({success: true});
+    console.log(schedule)
+
+    try {
+        Commands.setAlarmSchedule(schedule);
+        res.json({success: true});
+    }
+    catch(e) {
+        console.log(e);
+        res.json({success: false});
+    }
 })
 
 app.post("/setBrightness", (req, res, next) => {
@@ -62,10 +70,12 @@ app.post("/setBrightness", (req, res, next) => {
     }
 
     Commands.setPinValue(selectedPin, value)
-        .then((res: any) => {
+        .then((response: any) => {
+            console.log("success");
             res.json({success: true});
         })
         .catch((reason: any) => {
+            console.log(reason)
             res.json({success: false});
         });
         
