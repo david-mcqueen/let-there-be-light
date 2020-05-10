@@ -8,14 +8,12 @@ function Schedule() {
     return (
         <div className="slider">
             <Card>
-                <Card.Header as="h5">Schedule</Card.Header>
+                <Card.Header as="h5">Sleep</Card.Header>
                 <Card.Body>
-                    <Card.Title>Set the Alarm time</Card.Title>
                     <Card.Text>
-                    Check box for days of the week
-                    Input boxes for time
+                    Turn off the lights over 30 minutes
                     </Card.Text>
-                    <Button variant="primary">Set Alarm</Button>
+                    <Button variant="primary">Sleep</Button>
                 </Card.Body>
                 </Card>
         </div>
