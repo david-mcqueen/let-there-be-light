@@ -9,7 +9,7 @@ class Commands {
     private static scheduledTask: cron.ScheduledTask;
     
     public static startSleep = () => {
-        return Commands.consoleCommand(`python ./lamp-sleep.py`)
+        return Commands.consoleCommand(`python ./light-off.py`)
     }
 
     public static setPinValue = (pin: Pin, pct: number) => {
