@@ -1,8 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
+import InputGroup from 'react-bootstrap/InputGroup'
+import FormControl from 'react-bootstrap/FormControl'
+import ApiService from '../service/ApiService';
+
 function Schedule() {
+
+    const api = new ApiService()
+
+    const [schedule, setSchedule] = useState('');
+
+    const setAlarmSchedule = () => {
+
+        api.setSchedule(schedule);
+    }
 
 
     return (
@@ -12,10 +25,13 @@ function Schedule() {
                 <Card.Body>
                     <Card.Title>Set the Alarm time</Card.Title>
                     <Card.Text>
-                    Check box for days of the week
-                    Input boxes for time
+                    <InputGroup className="mb-3">
+                        <FormControl aria-describedby="alarm-time" placeholder="CRON expression" value={schedule} onChange={(e) => setSchedule(e.target.value)}/>
+                        <InputGroup.Append>
+                            <Button variant="outline-secondary" onClick={() => setAlarmSchedule()}>Set</Button>
+                        </InputGroup.Append>
+                    </InputGroup>
                     </Card.Text>
-                    <Button variant="primary">Set Alarm</Button>
                 </Card.Body>
                 </Card>
         </div>
