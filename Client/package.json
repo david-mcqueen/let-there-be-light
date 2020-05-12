@@ -21,6 +21,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "deploy": "scp -r ./build/ pi@192.168.1.104:~/sunrise-lamp/client", // Then copy it to sudo cp -R * /var/www/html
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
