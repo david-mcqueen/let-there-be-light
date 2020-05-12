@@ -1,12 +1,14 @@
 "use strict";
 
 import express from 'express';
+import cors from 'cors';
 import Commands from './commands';
 import bodyParser from 'body-parser';
 import Pin from './Pin';
 
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
