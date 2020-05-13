@@ -13,7 +13,10 @@ function Schedule() {
 
     const setValue = (value: number) => {
         api.setBrightness(Pin.WARM_WHITE, value);
-        api.setBrightness(Pin.COOL_WHITE, value);
+
+        // Always ensure CW is 0
+        // This can currently be turned on via the light-on.py script
+        api.setBrightness(Pin.COOL_WHITE, 0);
     }
 
 
