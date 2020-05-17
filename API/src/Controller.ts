@@ -4,28 +4,41 @@ import exec from 'child_process';
 import Pin from './Pin';
 import cron from 'node-cron';
 
-class Commands {
+class Controller {
 
-    private static scheduledTask: cron.ScheduledTask;
+    private static _controller: Controller;
     
-    public static startSleep = () => {
-        return Commands.consoleCommand(`python ./Scripts/light-off.py`)
+    public static get instance(): Controller {
+
+        if (!this._controller) {
+            this._controller = new Controller();
+        }
+
+        return this._controller;
     }
 
-    public static setPinValue = (pin: Pin, pct: number) => {
+    private constructor(){ }
+
+    private scheduledTask: cron.ScheduledTask | undefined;
+    
+    public startSleep = () => {
+        return this.consoleCommand(`python ./Scripts/light-off.py`)
+    }
+
+    public setPinValue = (pin: Pin, pct: number) => {
         const maxValue: number = 255;
         const value = Math.floor(maxValue * (pct / 100));
         
-        return Commands.consoleCommand(`pigs p ${pin} ${value}`);
+        return this.consoleCommand(`pigs p ${pin} ${value}`);
     }
 
-    public static setAlarmSchedule = (cronExpression: string) => {
-        if(Commands.scheduledTask){
-            Commands.scheduledTask.stop();
-            Commands.scheduledTask.destroy();
+    public setAlarmSchedule = (cronExpression: string) => {
+        if(this.scheduledTask){
+            this.scheduledTask.stop();
+            this.scheduledTask.destroy();
         }
 
-        Commands.scheduledTask = cron.schedule(cronExpression, () => {
+        this.scheduledTask = cron.schedule(cronExpression, () => {
             exec.exec('python ./Scripts/light-on.py', (err: any, stdout: any, stderr: any) => {
                 if (err) {
                     console.log("something went wrong");
@@ -37,10 +50,10 @@ class Commands {
             })
         });
 
-        Commands.scheduledTask.start();
+        this.scheduledTask.start();
     }
 
-    private static consoleCommand = (command: string) : Promise<any> => {
+    private consoleCommand = (command: string) : Promise<any> => {
 
         return new Promise<any>((resolve: any, reject: any) => {
             exec.exec(command, (err: any, stdout: any, stderr: any) => {
@@ -59,4 +72,4 @@ class Commands {
 }
 
 
-  export default Commands;
+  export default Controller;

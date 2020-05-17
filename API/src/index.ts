@@ -2,7 +2,7 @@
 
 import express from 'express';
 import cors from 'cors';
-import Commands from './commands';
+import Controller from './Controller';
 import bodyParser from 'body-parser';
 import Pin from './Pin';
 
@@ -21,7 +21,7 @@ app.get("/test", (req, res, next) => {
 })
 
 app.post("/sleep", (req, res, next) => {
-    Commands.startSleep()
+    Controller.instance.startSleep()
         .then((response: any) => {
             res.json({success: true})
         })
@@ -41,7 +41,7 @@ app.post("/setSchedule", (req, res, next) => {
     console.log(schedule)
 
     try {
-        Commands.setAlarmSchedule(schedule);
+        Controller.instance.setAlarmSchedule(schedule);
         res.json({success: true});
     }
     catch(e) {
@@ -71,7 +71,7 @@ app.post("/setBrightness", (req, res, next) => {
             return;
     }
 
-    Commands.setPinValue(selectedPin, value)
+    Controller.instance.setPinValue(selectedPin, value)
         .then((response: any) => {
             console.log("success");
             res.json({success: true});
