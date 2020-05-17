@@ -3,6 +3,7 @@
 import exec from 'child_process';
 import Pin from './Pin';
 import cron from 'node-cron';
+import Channel from './Channel';
 
 class Controller {
 
@@ -17,7 +18,21 @@ class Controller {
         return this._controller;
     }
 
-    private constructor(){ }
+    private constructor(){ 
+        this.warmChannel = new Channel(Pin.WARM_WHITE);
+        this.coolChannel = new Channel(Pin.COOL_WHITE);
+    }
+
+    private readonly coolChannel: Channel;
+    private readonly warmChannel: Channel;
+
+    private getChannel(pin: Pin): Channel {
+        if (pin === Pin.COOL_WHITE) {
+            return this.coolChannel;
+        }else {
+            return this.warmChannel;
+        }
+    }
 
     private scheduledTask: cron.ScheduledTask | undefined;
     
@@ -26,10 +41,9 @@ class Controller {
     }
 
     public setPinValue = (pin: Pin, pct: number) => {
-        const maxValue: number = 255;
-        const value = Math.floor(maxValue * (pct / 100));
-        
-        return this.consoleCommand(`pigs p ${pin} ${value}`);
+
+        this.getChannel(pin).setValuePct(pct);
+
     }
 
     public setAlarmSchedule = (cronExpression: string) => {
@@ -53,22 +67,9 @@ class Controller {
         this.scheduledTask.start();
     }
 
-    private consoleCommand = (command: string) : Promise<any> => {
 
-        return new Promise<any>((resolve: any, reject: any) => {
-            exec.exec(command, (err: any, stdout: any, stderr: any) => {
-                if (err) {
-                    reject("something went wrong");
-                    console.log(err)
-                }else {
-                    console.log(stderr)
-                    console.log(stdout)
-                    resolve();
-                }
-            })
 
-        });
-    };
+
 }
 
 
