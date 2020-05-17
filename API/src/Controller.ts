@@ -36,14 +36,13 @@ class Controller {
 
     private scheduledTask: cron.ScheduledTask | undefined;
     
-    public startSleep = () => {
-        return this.consoleCommand(`python ./Scripts/light-off.py`)
-    }
 
     public setPinValue = (pin: Pin, pct: number) => {
-
         this.getChannel(pin).setValuePct(pct);
+    }
 
+    public startSleep = () => {
+        return this.sleep();
     }
 
     public setAlarmSchedule = (cronExpression: string) => {
@@ -67,9 +66,29 @@ class Controller {
         this.scheduledTask.start();
     }
 
+    // Turns on the lights over a space of 30 mins
+    private wakeUp() {
 
+    }
 
+    // Turns off the lights over a space of 30 mins
+    private async sleep() {
+        const mins = 30;
+        const sec = mins * 60;
+        
+        // To get from the current value to 0 over 30 mins
+        const epochDelay = sec / this.warmChannel.currentValue;
 
+        // We don't want the white light on at all during sleep mode
+        this.coolChannel.setValue(0);
+
+        const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+
+        while (this.warmChannel.currentValue > 0){
+            this.warmChannel.decrementBrightness();
+            await wait(epochDelay);
+        }
+    }
 }
 
 

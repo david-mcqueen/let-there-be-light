@@ -5,11 +5,11 @@ class Channel {
     private _pin: Pin;
     private _currentValue: number; // The current set value of the channel
 
-    private set currentValue(val: number) {
+    public set currentValue(val: number) {
         this._currentValue = val;
     }
 
-    private get currentValue() : number {
+    public get currentValue() : number {
         return this._currentValue;
     }
 
