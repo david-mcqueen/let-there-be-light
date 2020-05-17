@@ -1,6 +1,5 @@
 "use strict";
 
-import exec from 'child_process';
 import Pin from './Pin';
 import cron from 'node-cron';
 import Channel from './Channel';
@@ -52,33 +51,58 @@ class Controller {
         }
 
         this.scheduledTask = cron.schedule(cronExpression, () => {
-            exec.exec('python ./Scripts/light-on.py', (err: any, stdout: any, stderr: any) => {
-                if (err) {
-                    console.log("something went wrong");
-                    console.log(err);
-                }else {
-                    console.log(stderr);
-                    console.log(stdout);
-                }
-            })
+            this.wakeUp()
+                .then(() => {
+                    console.log(`wakeUp complete`);
+                })
+                .catch(() => {
+                    console.log(`failed to wakeUp`);
+                })
         });
 
         this.scheduledTask.start();
     }
 
     // Turns on the lights over a space of 30 mins
-    private wakeUp() {
+    private async wakeUp() {
+        console.log("wakeUp");
 
+        const mins = 30;
+        const sec = mins * 60;
+        const maxValue = 255;
+        const midPoint = maxValue / 2;
+        const epochDelay = sec / maxValue;
+
+        console.log(`epochDelay: ${epochDelay}`);
+
+        const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+
+        while (this.warmChannel.currentValue < maxValue || this.coolChannel.currentValue < maxValue){
+
+            this.warmChannel.incrementBrightness();
+
+            if (this.warmChannel.currentValue > midPoint){
+                // As we start at half way, increment twice so we get to the end at the same point
+                this.coolChannel.incrementBrightness();
+                this.coolChannel.incrementBrightness();
+            }
+
+            await wait(epochDelay);
+        }
+
+        console.log(`done`)
     }
 
     // Turns off the lights over a space of 30 mins
     private async sleep() {
+        console.log("sleeping")
         const mins = 30;
         const sec = mins * 60;
         
         // To get from the current value to 0 over 30 mins
         const epochDelay = sec / this.warmChannel.currentValue;
 
+        console.log(`epochDelay: ${epochDelay}`);
         // We don't want the white light on at all during sleep mode
         this.coolChannel.setValue(0);
 
@@ -88,6 +112,8 @@ class Controller {
             this.warmChannel.decrementBrightness();
             await wait(epochDelay);
         }
+
+        console.log(`done`);
     }
 }
 
