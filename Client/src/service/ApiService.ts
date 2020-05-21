@@ -1,5 +1,6 @@
-import Pin from "../enums/Pin";
+import { toast } from 'react-toastify';
 
+import Pin from "../enums/Pin";
 class ApiService {
 
     private _url = `http://192.168.1.104:3000`
@@ -10,6 +11,14 @@ class ApiService {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
               }
+        })
+        .then((value: Response) => {
+            console.log('success')
+            toast.success(`success`);
+            return value;
+        })
+        .catch((reason: any) => {
+            toast.error('Failed to sleep');
         })
     }
 
@@ -23,6 +32,14 @@ class ApiService {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
             },
             body: data.toString()
+        })
+        .then((value: Response) => {
+            console.log('success')
+            toast.success(`success`);
+            return value;
+        })
+        .catch((reason: any) => {
+            toast.error(`Failed to setSchedule ${schedule}`);
         })
     }
 
@@ -38,6 +55,14 @@ class ApiService {
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
             },
             body: data.toString()
+        })
+        .then((value: Response) => {
+            console.log('success')
+            toast.success(`success`);
+            return value;
+        })
+        .catch((reason: any) => {
+            toast.error(`Failed to setBrightness on pin ${band}`);
         })
     }
 }
