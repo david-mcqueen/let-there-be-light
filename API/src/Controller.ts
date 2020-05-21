@@ -36,8 +36,8 @@ class Controller {
     private scheduledTask: cron.ScheduledTask | undefined;
     
 
-    public setPinValue = (pin: Pin, pct: number) => {
-        this.getChannel(pin).setValuePct(pct);
+    public setPinValue = (pin: Pin, pct: number): Promise<any>  => {
+        return this.getChannel(pin).setValuePct(pct);
     }
 
     public startSleep = () => {
@@ -99,12 +99,13 @@ class Controller {
         const mins = 30;
         const sec = mins * 60;
         
+        // We don't want the white light on at all during sleep mode
+        this.coolChannel.setValue(0);
+        
         // To get from the current value to 0 over 30 mins
         const epochDelay = sec / this.warmChannel.currentValue;
 
         console.log(`epochDelay: ${epochDelay}`);
-        // We don't want the white light on at all during sleep mode
-        this.coolChannel.setValue(0);
 
         const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
 

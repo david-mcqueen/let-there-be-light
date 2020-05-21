@@ -26,20 +26,24 @@ class Channel {
 
     public decrementBrightness() {
         if (this.currentValue > 0){
-            this.setValue(this.currentValue - 1);
+            const valueToSet = this.currentValue - 1;
+            this.setValue(valueToSet);
         }
     }
 
-    public setValuePct(pct: number) {
+    public setValuePct(pct: number): Promise<any> {
         const maxValue: number = 255;
         const value = Math.floor(maxValue * (pct / 100));
         
-        this.setValue(value);
+        return this.setValue(value);
     }
 
-    public setValue(val: number) {
-        this.currentValue = val;
-        return this.consoleCommand(`pigs p ${this._pin} ${val}`);
+    public setValue(val: number): Promise<any> {
+        return this.consoleCommand(`pigs p ${this._pin} ${val}`)
+            .then(() => {
+                this.currentValue = val;
+                return;
+            })
     }
 
     private consoleCommand = (command: string) : Promise<any> => {
