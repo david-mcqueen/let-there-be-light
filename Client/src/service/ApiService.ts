@@ -22,9 +22,11 @@ class ApiService {
         })
     }
 
-    public setSchedule = (schedule: string) => {
+    public setSchedule = (schedule: string, part: string) => {
+        
         var data = new URLSearchParams();
         data.append('schedule', schedule);
+        data.append('part', part)
 
         return fetch(`${this._url}/setSchedule`, {
             method: 'POST',
@@ -66,7 +68,7 @@ class ApiService {
         })
     }
 
-    public getStatus = (): Promise<{ww: number, cw: number}> => {
+    public getStatus = (): Promise<{ ww: number, cw: number, weekendSchedule: string, weekdaySchedule: string }> => {
         return fetch(`${this._url}/status`, {
             method: 'GET',
             headers: {

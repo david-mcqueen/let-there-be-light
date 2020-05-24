@@ -16,6 +16,7 @@
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "react-time-picker": "^4.0.1",
     "react-toastify": "^6.0.5",
     "typescript": "^3.7.5"
   },
