@@ -19,8 +19,9 @@ function Schedule() {
     useEffect(() => {
         api.getStatus()
             .then((resp: { ww: number, cw: number, weekendSchedule: string, weekdaySchedule: string }) => {
-                setWeekendSchedule(weekendSchedule);
-                setWeekdaySchedule(weekdaySchedule);
+                debugger;
+                setWeekendSchedule(resp.weekendSchedule);
+                setWeekdaySchedule(resp.weekdaySchedule);
             })
     }, [])
 
