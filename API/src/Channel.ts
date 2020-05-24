@@ -4,6 +4,7 @@ import exec from 'child_process';
 class Channel {
     private _pin: Pin;
     private _currentValue: number; // The current set value of the channel
+    private _maxValue: number = 255;
 
     public set currentValue(val: number) {
         this._currentValue = val;
@@ -11,6 +12,10 @@ class Channel {
 
     public get currentValue() : number {
         return this._currentValue;
+    }
+
+    public get currentValuePct() : number {
+        return Math.floor((this._currentValue / this._maxValue) * 100);
     }
 
     constructor(pin: Pin) {
@@ -32,8 +37,8 @@ class Channel {
     }
 
     public setValuePct(pct: number): Promise<any> {
-        const maxValue: number = 255;
-        const value = Math.floor(maxValue * (pct / 100));
+        
+        const value = Math.floor(this._maxValue * (pct / 100));
         
         return this.setValue(value);
     }

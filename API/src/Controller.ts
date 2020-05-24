@@ -35,6 +35,12 @@ class Controller {
 
     private scheduledTask: cron.ScheduledTask | undefined;
     
+    public getStatus = () => {
+        return {
+            ww: this.warmChannel.currentValuePct,
+            cw: this.coolChannel.currentValuePct
+        }
+    }
 
     public setPinValue = (pin: Pin, pct: number): Promise<any>  => {
         return this.getChannel(pin).setValuePct(pct);

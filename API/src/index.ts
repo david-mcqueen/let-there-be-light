@@ -20,6 +20,10 @@ app.get("/test", (req, res, next) => {
     res.json({success: true});
 })
 
+app.get("/status", (req, res, next) => {
+    res.json(Controller.instance.getStatus());
+})
+
 app.post("/sleep", (req, res, next) => {
     Controller.instance.startSleep()
         .then((response: any) => {
