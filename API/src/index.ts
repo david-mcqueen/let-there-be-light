@@ -37,15 +37,15 @@ app.post("/sleep", (req, res, next) => {
 
 app.post("/setSchedule", (req, res, next) => {
     const schedule = req.body.schedule;
-    if(!schedule) {
+    const part = req.body.part;
+
+    if(!schedule || !part) {
         res.json({success: false});
         return;
     }
 
-    console.log(schedule)
-
     try {
-        Controller.instance.setAlarmSchedule(schedule);
+        Controller.instance.setAlarmSchedule(schedule, part);
         res.json({success: true});
     }
     catch(e) {

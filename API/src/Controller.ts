@@ -33,7 +33,8 @@ class Controller {
         }
     }
 
-    private scheduledTask: cron.ScheduledTask | undefined;
+    private scheduledTaskWeekday: cron.ScheduledTask | undefined;
+    private scheduledTaskWeekend: cron.ScheduledTask | undefined;
     
     public getStatus = () => {
         return {
@@ -50,13 +51,9 @@ class Controller {
         return this.sleep();
     }
 
-    public setAlarmSchedule = (cronExpression: string) => {
-        if(this.scheduledTask){
-            this.scheduledTask.stop();
-            this.scheduledTask.destroy();
-        }
+    public setAlarmSchedule = (cronExpression: string, part: string) => {
 
-        this.scheduledTask = cron.schedule(cronExpression, () => {
+        const newSchedule = cron.schedule(cronExpression, () => {
             this.wakeUp()
                 .then(() => {
                     console.log(`wakeUp complete`);
@@ -66,7 +63,25 @@ class Controller {
                 })
         });
 
-        this.scheduledTask.start();
+        if (part === "WEEKEND"){
+            if(this.scheduledTaskWeekend){
+                this.scheduledTaskWeekend.stop();
+                this.scheduledTaskWeekend.destroy();
+            }
+
+            this.scheduledTaskWeekend = newSchedule;
+            this.scheduledTaskWeekend.start();
+            
+        }else if (part === "WEEKDAY") {
+            if(this.scheduledTaskWeekday){
+                this.scheduledTaskWeekday.stop();
+                this.scheduledTaskWeekday.destroy();
+            }
+
+            this.scheduledTaskWeekday = newSchedule;
+            this.scheduledTaskWeekday.start();  
+        }
+
     }
 
     // Turns on the lights over a space of 30 mins
