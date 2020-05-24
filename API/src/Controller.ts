@@ -34,12 +34,16 @@ class Controller {
     }
 
     private scheduledTaskWeekday: cron.ScheduledTask | undefined;
+    private scheduledTaskWeekday_time: string = "";
     private scheduledTaskWeekend: cron.ScheduledTask | undefined;
+    private scheduledTaskWeekend_time: string = "";
     
     public getStatus = () => {
         return {
             ww: this.warmChannel.currentValuePct,
-            cw: this.coolChannel.currentValuePct
+            cw: this.coolChannel.currentValuePct,
+            weekendSchedule: this.scheduledTaskWeekend_time,
+            weekdaySchedule: this.scheduledTaskWeekday_time
         }
     }
 
@@ -51,7 +55,12 @@ class Controller {
         return this.sleep();
     }
 
-    public setAlarmSchedule = (cronExpression: string, part: string) => {
+    public setAlarmSchedule = (time: string, part: string) => {
+
+        const datePart = part === "WEEKEND" ? "6-7" : "1-5";
+
+        const timeParts = time.split(":");
+        let cronExpression = `* ${timeParts[1]} ${timeParts[0]} * * ${datePart}`;
 
         const newSchedule = cron.schedule(cronExpression, () => {
             this.wakeUp()
@@ -71,6 +80,7 @@ class Controller {
 
             this.scheduledTaskWeekend = newSchedule;
             this.scheduledTaskWeekend.start();
+            this.scheduledTaskWeekend_time = time;
             
         }else if (part === "WEEKDAY") {
             if(this.scheduledTaskWeekday){
@@ -80,6 +90,7 @@ class Controller {
 
             this.scheduledTaskWeekday = newSchedule;
             this.scheduledTaskWeekday.start();  
+            this.scheduledTaskWeekday_time = time;
         }
 
     }

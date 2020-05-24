@@ -28,12 +28,8 @@ function Schedule() {
     const [weekendSchedule, setWeekendSchedule] = useState('');
 
     const setAlarmSchedules = () => {
-
-        const weekdayParts = weekdaySchedule.split(":");
-        const weekendParts = weekendSchedule.split(":");
-
-        api.setSchedule(`* ${weekdayParts[1]} ${weekdayParts[0]} * * 1-5`, weekpart.WEEKDAY);
-        api.setSchedule(`* ${weekendParts[1]} ${weekendParts[0]} * * 6-7`, weekpart.WEEKEND);
+        api.setSchedule(weekdaySchedule, weekpart.WEEKDAY);
+        api.setSchedule(weekendSchedule, weekpart.WEEKEND);
     }
 
     const setScheduleFromPicker = (datetimeValue: string, part: string) => {
