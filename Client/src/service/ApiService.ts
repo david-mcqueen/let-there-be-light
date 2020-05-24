@@ -65,6 +65,24 @@ class ApiService {
             toast.error(`Failed to setBrightness on pin ${band}`);
         })
     }
+
+    public getStatus = (): Promise<{ww: number, cw: number}> => {
+        return fetch(`${this._url}/status`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+              }
+        })
+        .then((value: Response) => {
+            if (!value.ok) {
+                throw new Error(value.statusText)
+              }
+              return value.json()
+        })
+        .catch((reason: any) => {
+            toast.error('Failed to getStatus');
+        })
+    }
 }
 
 export default ApiService;
