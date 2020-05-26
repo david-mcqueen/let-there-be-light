@@ -37,13 +37,15 @@ class Controller {
     private scheduledTaskWeekday_time: string = "";
     private scheduledTaskWeekend: cron.ScheduledTask | undefined;
     private scheduledTaskWeekend_time: string = "";
+    private isSleeping: boolean = false;
     
     public getStatus = () => {
         return {
             ww: this.warmChannel.currentValuePct,
             cw: this.coolChannel.currentValuePct,
             weekendSchedule: this.scheduledTaskWeekend_time,
-            weekdaySchedule: this.scheduledTaskWeekday_time
+            weekdaySchedule: this.scheduledTaskWeekday_time,
+            isSleeping: this.isSleeping
         }
     }
 
@@ -53,6 +55,10 @@ class Controller {
 
     public startSleep = () => {
         return this.sleep();
+    }
+
+    public stopSleep = () => {
+        this.isSleeping = false;
     }
 
     public setAlarmSchedule = (time: string, part: string) => {
@@ -127,7 +133,12 @@ class Controller {
 
     // Turns off the lights over a space of 30 mins
     private async sleep() {
-        console.log("sleeping")
+        if (this.isSleeping){
+            return;
+        }
+
+        this.isSleeping = true;
+
         const mins = 30;
         const sec = mins * 60;
         
@@ -141,7 +152,7 @@ class Controller {
 
         const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
 
-        while (this.warmChannel.currentValue > 0){
+        while (this.warmChannel.currentValue > 0 && this.isSleeping){
             this.warmChannel.decrementBrightness();
             await wait(epochDelay);
         }
@@ -150,5 +161,4 @@ class Controller {
     }
 }
 
-
-  export default Controller;
+export default Controller;

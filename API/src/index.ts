@@ -35,6 +35,11 @@ app.post("/sleep", (req, res, next) => {
         })
 });
 
+app.post("/stopsleep", (req, res, next) => {
+    Controller.instance.stopSleep()
+    res.json({success: true})
+});
+
 app.post("/setSchedule", (req, res, next) => {
     const schedule = req.body.schedule;
     const part = req.body.part;
