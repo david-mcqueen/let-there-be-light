@@ -22,6 +22,22 @@ class ApiService {
         })
     }
 
+    public stopSleep = () => {
+        return fetch(`${this._url}/stopsleep`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+              }
+        })
+        .then((value: Response) => {
+            toast.success(`success`);
+            return value;
+        })
+        .catch((reason: any) => {
+            toast.error('Failed to sleep');
+        })
+    }
+
     public setSchedule = (schedule: string, part: string) => {
         
         var data = new URLSearchParams();
@@ -68,7 +84,7 @@ class ApiService {
         })
     }
 
-    public getStatus = (): Promise<{ ww: number, cw: number, weekendSchedule: string, weekdaySchedule: string }> => {
+    public getStatus = (): Promise<{ ww: number, cw: number, weekendSchedule: string, weekdaySchedule: string, isSleeping: boolean }> => {
         return fetch(`${this._url}/status`, {
             method: 'GET',
             headers: {
