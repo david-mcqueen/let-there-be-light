@@ -53,8 +53,12 @@ function Schedule() {
     }, 5000, true)
 
     const turnOff = () => {
+        setValue(0);
+        setValue(0, true);
+        
         setcw_value(0);
         setww_value(0);
+        
     }
 
 
