@@ -19,7 +19,6 @@ function App() {
       <Container fluid>
         <Row>
           <Col>
-            <Status />
             <Sleep />
             <LightControl />
             <Schedule />
