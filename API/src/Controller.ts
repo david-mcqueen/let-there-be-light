@@ -33,12 +33,19 @@ class Controller {
         }
     }
 
-    private scheduledTask: cron.ScheduledTask | undefined;
+    private scheduledTaskWeekday: cron.ScheduledTask | undefined;
+    private scheduledTaskWeekday_time: string = "";
+    private scheduledTaskWeekend: cron.ScheduledTask | undefined;
+    private scheduledTaskWeekend_time: string = "";
+    private isSleeping: boolean = false;
     
     public getStatus = () => {
         return {
             ww: this.warmChannel.currentValuePct,
-            cw: this.coolChannel.currentValuePct
+            cw: this.coolChannel.currentValuePct,
+            weekendSchedule: this.scheduledTaskWeekend_time,
+            weekdaySchedule: this.scheduledTaskWeekday_time,
+            isSleeping: this.isSleeping
         }
     }
 
@@ -50,13 +57,18 @@ class Controller {
         return this.sleep();
     }
 
-    public setAlarmSchedule = (cronExpression: string) => {
-        if(this.scheduledTask){
-            this.scheduledTask.stop();
-            this.scheduledTask.destroy();
-        }
+    public stopSleep = () => {
+        this.isSleeping = false;
+    }
 
-        this.scheduledTask = cron.schedule(cronExpression, () => {
+    public setAlarmSchedule = (time: string, part: string) => {
+
+        const datePart = part === "WEEKEND" ? "6-7" : "1-5";
+
+        const timeParts = time.split(":");
+        let cronExpression = `* ${timeParts[1]} ${timeParts[0]} * * ${datePart}`;
+
+        const newSchedule = cron.schedule(cronExpression, () => {
             this.wakeUp()
                 .then(() => {
                     console.log(`wakeUp complete`);
@@ -66,7 +78,27 @@ class Controller {
                 })
         });
 
-        this.scheduledTask.start();
+        if (part === "WEEKEND"){
+            if(this.scheduledTaskWeekend){
+                this.scheduledTaskWeekend.stop();
+                this.scheduledTaskWeekend.destroy();
+            }
+
+            this.scheduledTaskWeekend = newSchedule;
+            this.scheduledTaskWeekend.start();
+            this.scheduledTaskWeekend_time = time;
+            
+        }else if (part === "WEEKDAY") {
+            if(this.scheduledTaskWeekday){
+                this.scheduledTaskWeekday.stop();
+                this.scheduledTaskWeekday.destroy();
+            }
+
+            this.scheduledTaskWeekday = newSchedule;
+            this.scheduledTaskWeekday.start();  
+            this.scheduledTaskWeekday_time = time;
+        }
+
     }
 
     // Turns on the lights over a space of 30 mins
@@ -101,7 +133,12 @@ class Controller {
 
     // Turns off the lights over a space of 30 mins
     private async sleep() {
-        console.log("sleeping")
+        if (this.isSleeping){
+            return;
+        }
+
+        this.isSleeping = true;
+
         const mins = 30;
         const sec = mins * 60;
         
@@ -115,7 +152,7 @@ class Controller {
 
         const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
 
-        while (this.warmChannel.currentValue > 0){
+        while (this.warmChannel.currentValue > 0 && this.isSleeping){
             this.warmChannel.decrementBrightness();
             await wait(epochDelay);
         }
@@ -124,5 +161,4 @@ class Controller {
     }
 }
 
-
-  export default Controller;
+export default Controller;

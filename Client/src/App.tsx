@@ -11,7 +11,6 @@ import Col from 'react-bootstrap/Col';
 import Schedule from './Components/Schedule';
 import Sleep from './Components/Sleep';
 import LightControl from './Components/LightControl';
-import Status from './Components/Status';
 
 function App() {
   return (
@@ -19,7 +18,6 @@ function App() {
       <Container fluid>
         <Row>
           <Col>
-            <Status />
             <Sleep />
             <LightControl />
             <Schedule />

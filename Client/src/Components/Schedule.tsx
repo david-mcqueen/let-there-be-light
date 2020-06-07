@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
+import TimePicker from 'react-time-picker'
 
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
@@ -8,13 +9,35 @@ import ApiService from '../service/ApiService';
 
 function Schedule() {
 
-    const api = new ApiService()
+    const weekpart = {
+        WEEKDAY: "WEEKDAY",
+        WEEKEND: "WEEKEND"
+    }
 
-    const [schedule, setSchedule] = useState('');
+    const api = new ApiService();
 
-    const setAlarmSchedule = () => {
+    useEffect(() => {
+        api.getStatus()
+            .then((resp: { ww: number, cw: number, weekendSchedule: string, weekdaySchedule: string }) => {
+                setWeekendSchedule(resp.weekendSchedule);
+                setWeekdaySchedule(resp.weekdaySchedule);
+            })
+    }, [])
 
-        api.setSchedule(schedule);
+    const [weekdaySchedule, setWeekdaySchedule] = useState('');
+    const [weekendSchedule, setWeekendSchedule] = useState('');
+
+    const setAlarmSchedules = () => {
+        api.setSchedule(weekdaySchedule, weekpart.WEEKDAY);
+        api.setSchedule(weekendSchedule, weekpart.WEEKEND);
+    }
+
+    const setScheduleFromPicker = (datetimeValue: string, part: string) => {
+        if(part === weekpart.WEEKDAY){
+            setWeekdaySchedule(datetimeValue);
+        }else if (part === weekpart.WEEKEND){
+            setWeekendSchedule(datetimeValue);
+        }
     }
 
 
@@ -23,15 +46,20 @@ function Schedule() {
             <Card>
                 <Card.Header as="h5">Schedule</Card.Header>
                 <Card.Body>
-                    <Card.Title>Set the Alarm time</Card.Title>
+                    <Card.Title>Weekday</Card.Title>
                     <Card.Text>
                     <InputGroup className="mb-3">
-                        <FormControl aria-describedby="alarm-time" placeholder="CRON expression" value={schedule} onChange={(e) => setSchedule(e.target.value)}/>
-                        <InputGroup.Append>
-                            <Button variant="outline-secondary" onClick={() => setAlarmSchedule()}>Set</Button>
-                        </InputGroup.Append>
+                        <TimePicker value={weekdaySchedule} onChange={(value: any) => setScheduleFromPicker(value, weekpart.WEEKDAY)}/>
                     </InputGroup>
                     </Card.Text>
+
+                    <Card.Title>Weekend</Card.Title>
+                    <Card.Text>
+                    <InputGroup className="mb-3">
+                        <TimePicker value={weekendSchedule} onChange={(value: any) => setScheduleFromPicker(value, weekpart.WEEKEND)}/>
+                    </InputGroup>
+                    </Card.Text>
+                            <Button variant="outline-secondary" onClick={() => setAlarmSchedules()}>Set</Button>
                 </Card.Body>
                 </Card>
         </div>
