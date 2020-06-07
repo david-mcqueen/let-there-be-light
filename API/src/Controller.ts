@@ -157,6 +157,7 @@ class Controller {
             await wait(epochDelay);
         }
 
+        this.isSleeping = false;
         console.log(`done`);
     }
 }
