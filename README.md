@@ -4,7 +4,7 @@ Inspired by a [Lumie sunrise lamp](https://www.lumie.com/collections/wake-up-lig
 
 
 > ##### Note
-This project is in active development. It works and I am currently using it in replacement of the 2 Lumie lamps we had in the bedroom, however there are minor known issues which I am yet to fix, along with some polish which needs applying. Although don\'t let that put you off taking a look and having a play, maybe submit a pull request ;)
+> This project is in active development. It works and I am currently using it in replacement of the 2 Lumie lamps we had in the bedroom, however there are minor known issues > which I am yet to fix, along with some polish which needs applying. Although don\'t let that put you off taking a look and having a play, maybe submit a pull request ;)
 
 ## Project Structure
 The project is componsed of 2 core software parts, the API and the Client. Both of these components are hosted on the RaspberryPi, visible on the local network, that serves up the client to control the lamp via a mobile device. 
