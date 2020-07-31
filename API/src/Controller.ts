@@ -107,7 +107,7 @@ class Controller {
 
         const mins = 30;
         const sec = mins * 60;
-        const maxValue = 255;
+        const maxValue = this.warmChannel.MaxValue;
         const midPoint = maxValue / 2;
         const epochDelay = sec / maxValue;
 
@@ -146,7 +146,7 @@ class Controller {
         this.coolChannel.setValue(0);
         
         // To get from the current value to 0 over 30 mins
-        const epochDelay = sec / this.warmChannel.currentValue;
+        const epochDelay = sec / this.warmChannel.MaxValue;
 
         console.log(`epochDelay: ${epochDelay}`);
 
@@ -156,6 +156,8 @@ class Controller {
             this.warmChannel.decrementBrightness();
             await wait(epochDelay);
         }
+
+        this.isSleeping = false;
 
         console.log(`done`);
     }

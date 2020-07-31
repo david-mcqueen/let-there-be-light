@@ -10,6 +10,10 @@ class Channel {
         this._currentValue = val;
     }
 
+    public get MaxValue(): number {
+        return this._maxValue;
+    }
+
     public get currentValue() : number {
         return this._currentValue;
     }
@@ -24,7 +28,7 @@ class Channel {
     }
 
     public incrementBrightness() {
-        if(this.currentValue < 255){
+        if(this.currentValue < this._maxValue){
             this.setValue(this.currentValue + 1);
         }
     }
