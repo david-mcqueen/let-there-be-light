@@ -40,12 +40,14 @@ class Controller {
     private isSleeping: boolean = false;
     
     public getStatus = () => {
+
         return {
             ww: this.warmChannel.currentValuePct,
             cw: this.coolChannel.currentValuePct,
             weekendSchedule: this.scheduledTaskWeekend_time,
             weekdaySchedule: this.scheduledTaskWeekday_time,
-            isSleeping: this.isSleeping
+            isSleeping: this.isSleeping,
+            version: "0.1.1"
         }
     }
 
@@ -115,7 +117,7 @@ class Controller {
 
         const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
 
-        while (this.warmChannel.currentValue < maxValue || this.coolChannel.currentValue < maxValue){
+        while (this.warmChannel.currentValue < this.warmChannel.MaxValue || this.coolChannel.currentValue < this.coolChannel.MaxValue){
 
             this.warmChannel.incrementBrightness();
 
