@@ -51,3 +51,53 @@ describe('Test IoC channels', () => {
         expect(status.cw).toBe(10);
     });
 });
+
+
+describe('Test sleep & Wake', () => {
+
+    jest.useFakeTimers();
+
+    let cnt: Controller;
+
+    beforeAll(() => {
+        process.env.NODE_ENV="test";
+        cnt = Controller.instance;
+    })
+
+    test('sleep from max value', () => {
+        const cwSpy = jest.spyOn(cnt.getChannel(Pin.COOL_WHITE), 'setValue' );
+        const wwSpy = jest.spyOn(cnt.getChannel(Pin.WARM_WHITE), 'decrementBrightness' );
+
+        cnt.setPinValuePct(Pin.COOL_WHITE, 100);
+        cnt.setPinValuePct(Pin.WARM_WHITE, 100);
+
+        const pendingPromise = cnt.startSleep()
+            .then(resolved => {
+                expect(wwSpy).toHaveBeenCalledTimes(255);
+                expect(cwSpy).toHaveBeenCalledTimes(2); // 2 for some reason...
+            })
+
+        jest.runAllTimers();
+        
+        return pendingPromise;
+    })
+
+    test('wake from no value', () => {
+        const cwSpy = jest.spyOn(cnt.getChannel(Pin.COOL_WHITE), 'incrementBrightness' );
+        const wwSpy = jest.spyOn(cnt.getChannel(Pin.WARM_WHITE), 'incrementBrightness' );
+
+        cnt.setPinValuePct(Pin.COOL_WHITE, 0);
+        cnt.setPinValuePct(Pin.WARM_WHITE, 0);
+
+        const pendingPromise = cnt.wakeUp()
+            .then(resolved => {
+                expect(wwSpy).toHaveBeenCalledTimes(255);
+                expect(cwSpy).toHaveBeenCalledTimes(255);
+            })
+
+        jest.runAllTimers();
+        
+        return pendingPromise;
+    })
+
+})

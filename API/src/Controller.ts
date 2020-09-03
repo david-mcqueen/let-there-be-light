@@ -31,7 +31,7 @@ class Controller {
         this.coolChannel = new channelConstructor(Pin.COOL_WHITE);
     }
 
-    private getChannel(pin: Pin): IChannel {
+    public getChannel(pin: Pin): IChannel {
         if (pin === Pin.COOL_WHITE) {
             return this.coolChannel;
         }else {
@@ -120,7 +120,7 @@ class Controller {
         return Math.round(epochDelay * 1000);
     }
 
-    private async wakeUp() {
+    public async wakeUp(): Promise<void> {
         if (this.isWaking){
             return;
         }
@@ -130,36 +130,33 @@ class Controller {
 
         const epochDelay = this.getWaitTimeMs(this.warmChannel.MaxValue);
 
-        const intervalObj = setInterval(() => {
+        const warm = this.warmChannel;
+        const cool = this.coolChannel;
 
-            if (this.warmChannel.currentValue >= this.warmChannel.MaxValue 
-                && this.coolChannel.currentValue >= this.coolChannel.MaxValue){
-                
-                    this.isWaking = false;
-                    clearInterval(intervalObj);
-            }
-
-            // Warm Channel
-            if (this.warmChannel.currentValue < this.warmChannel.MaxValue){
-                this.warmChannel.incrementBrightness();
-            }
-
-            // Cool Channel
-            if (this.coolChannel.currentValue < this.coolChannel.MaxValue){
-                if (this.warmChannel.currentValue > (this.warmChannel.currentValue / 2)){
-                    // As we start at half way, increment twice so we get to the end at the same point
-                    this.coolChannel.incrementBrightness();
-                    this.coolChannel.incrementBrightness();
+        return new Promise<void> ((resolve, reject) => {
+            const intervalObj = setInterval(() => {
+    
+                if (warm.currentValue >= warm.MaxValue 
+                    && cool.currentValue >= cool.MaxValue){
+                    
+                        this.isWaking = false;
+                        clearInterval(intervalObj);
+                        resolve();
                 }
-            }
 
-        }, epochDelay);
+                if (warm.currentValue < warm.MaxValue){
+                    warm.incrementBrightness();
+                    cool.incrementBrightness();
+                }
+    
+            }, epochDelay);
+        });
 
         // console.log(`done`)
     }
 
     // Turns off the lights over a space of 30 mins
-    private async sleep() {
+    private async sleep(): Promise<void> {
         if (this.isSleeping){
             return;
         }
@@ -171,18 +168,23 @@ class Controller {
         // We don't want the white light on at all during sleep mode
         this.coolChannel.setValue(0);
 
-        const intervalObj = setInterval(() => {
+        const warm = this.warmChannel;
 
-            if (this.warmChannel.currentValue >= this.warmChannel.MaxValue){
-                this.isSleeping = false;
-                // console.log(`[]`);
-                clearInterval(intervalObj);
-            }
+        return new Promise<void> ((resolve, reject) => {
+            const intervalObj = setInterval(() => {
 
-            if (this.warmChannel.currentValue > 0){
-                this.warmChannel.decrementBrightness();
-            }
-        }, epochDelay);
+                if (warm.currentValue <= 0){
+                    this.isSleeping = false;
+                    // console.log(`[]`);
+                    clearInterval(intervalObj);
+                    resolve();
+                }
+
+                if (warm.currentValue > 0){
+                    warm.decrementBrightness();
+                }
+            }, epochDelay);
+        });
     }
 }
 
