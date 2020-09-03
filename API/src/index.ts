@@ -80,7 +80,7 @@ app.post("/setBrightness", (req, res, next) => {
             return;
     }
 
-    Controller.instance.setPinValue(selectedPin, value)
+    Controller.instance.setPinValuePct(selectedPin, value)
         .then((response: any) => {
             console.log("success");
             res.json({success: true});

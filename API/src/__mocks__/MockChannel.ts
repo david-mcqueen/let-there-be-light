@@ -10,8 +10,11 @@ class MockChannel extends Channel {
         super(pin);
     }
 
-    public setValue(val: number): void {
+    public setValue(val: number): Promise<any> {
         this.currentValue = val;
+        return new Promise<any>((resolve: any, reject: any) => {
+            resolve();
+        })
     }
 }
 

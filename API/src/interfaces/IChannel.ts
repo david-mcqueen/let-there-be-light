@@ -7,7 +7,7 @@ export default interface IChannel {
     incrementBrightness(): void;
     decrementBrightness(): void;
 
-    setValuePct(pct: number): void;
+    setValuePct(pct: number): Promise<any>;
 
-    setValue(val: Number): void;
+    setValue(val: Number): Promise<any>;
 }

@@ -59,9 +59,9 @@ class Controller {
         }
     }
 
-    public setPinValue = (pin: Pin, pct: number): void  => {
+    public setPinValuePct = (pin: Pin, pct: number): Promise<any>  => {
         const pinChannel = this.getChannel(pin)
-        pinChannel.setValuePct(pct);
+        return pinChannel.setValuePct(pct);
     }
 
     public startSleep = () => {

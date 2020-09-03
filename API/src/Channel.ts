@@ -43,15 +43,15 @@ class Channel implements IChannel {
         }
     }
 
-    public setValuePct(pct: number): void {
+    public setValuePct(pct: number): Promise<any> {
         
-        const value = Math.floor(this._maxValue * (pct / 100));
+        const value = Math.round(this._maxValue * (pct / 100));
         
-        this.setValue(value);
+        return this.setValue(value);
     }
 
-    public setValue(val: number): void {
-        this.consoleCommand(`pigs p ${this._pin} ${val}`)
+    public setValue(val: number): Promise<any> {
+        return this.consoleCommand(`pigs p ${this._pin} ${val}`)
             .then(() => {
                 this.currentValue = val;
                 return;

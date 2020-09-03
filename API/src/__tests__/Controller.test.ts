@@ -46,8 +46,8 @@ describe('Test IoC channels', () => {
     test('it has multiple instaces of the class', () => {
         const controller =  Controller.instance;
 
-        controller.setPinValue(Pin.COOL_WHITE, 10)
+        controller.setPinValuePct(Pin.COOL_WHITE, 10)
         const status: IStatus = controller.getStatus();
-        expect(status.cw).toBe(25);
+        expect(status.cw).toBe(10);
     });
 });
