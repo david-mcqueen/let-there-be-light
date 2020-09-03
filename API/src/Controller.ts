@@ -100,37 +100,46 @@ class Controller {
             this.scheduledTaskWeekday.start();  
             this.scheduledTaskWeekday_time = time;
         }
-
     }
 
-    // Turns on the lights over a space of 30 mins
-    private async wakeUp() {
-        console.log("wakeUp");
-
-        const mins = 30;
-        const sec = mins * 60;
-        const maxValue = this.warmChannel.MaxValue;
-        const midPoint = maxValue / 2;
+    public getWaitTimeMs(maxValue: number, durationMins: number = 30): number {
+        const sec = durationMins * 60;
         const epochDelay = sec / maxValue;
 
-        console.log(`epochDelay: ${epochDelay}`);
+        // console.log(`epochDelay: ${epochDelay}`);
 
-        const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+        return Math.round(epochDelay * 1000);
+    }
 
-        while (this.warmChannel.currentValue < this.warmChannel.MaxValue || this.coolChannel.currentValue < this.coolChannel.MaxValue){
+    private async wakeUp() {
+        // console.log("wakeUp");
 
-            this.warmChannel.incrementBrightness();
+        const epochDelay = this.getWaitTimeMs(this.warmChannel.MaxValue);
 
-            if (this.warmChannel.currentValue > midPoint){
-                // As we start at half way, increment twice so we get to the end at the same point
-                this.coolChannel.incrementBrightness();
-                this.coolChannel.incrementBrightness();
+        const intervalObj = setInterval(() => {
+
+            if (this.warmChannel.currentValue >= this.warmChannel.MaxValue 
+                && this.coolChannel.currentValue >= this.coolChannel.MaxValue){
+                clearInterval(intervalObj);
             }
 
-            await wait(epochDelay);
-        }
+            // Warm Channel
+            if (this.warmChannel.currentValue < this.warmChannel.MaxValue){
+                this.warmChannel.incrementBrightness();
+            }
 
-        console.log(`done`)
+            // Cool Channel
+            if (this.coolChannel.currentValue < this.coolChannel.MaxValue){
+                if (this.warmChannel.currentValue > (this.warmChannel.currentValue / 2)){
+                    // As we start at half way, increment twice so we get to the end at the same point
+                    this.coolChannel.incrementBrightness();
+                    this.coolChannel.incrementBrightness();
+                }
+            }
+
+        }, epochDelay);
+
+        // console.log(`done`)
     }
 
     // Turns off the lights over a space of 30 mins
