@@ -65,16 +65,17 @@ describe('Test sleep & Wake', () => {
     })
 
     test('sleep from max value', () => {
-        const cwSpy = jest.spyOn(cnt.getChannel(Pin.COOL_WHITE), 'setValue' );
-        const wwSpy = jest.spyOn(cnt.getChannel(Pin.WARM_WHITE), 'decrementBrightness' );
-
         cnt.setPinValuePct(Pin.COOL_WHITE, 100);
         cnt.setPinValuePct(Pin.WARM_WHITE, 100);
+
+        const cwSpy = jest.spyOn(cnt.getChannel(Pin.COOL_WHITE), 'setValue' );
+        const wwSpy = jest.spyOn(cnt.getChannel(Pin.WARM_WHITE), 'decrementBrightness' );
+        
 
         const pendingPromise = cnt.startSleep()
             .then(resolved => {
                 expect(wwSpy).toHaveBeenCalledTimes(255);
-                expect(cwSpy).toHaveBeenCalledTimes(2); // 2 for some reason...
+                expect(cwSpy).toHaveBeenCalledTimes(1);
             })
 
         jest.runAllTimers();
