@@ -1,31 +1,37 @@
-"use strict";
-
+import { injectable, inject, Container, interfaces } from 'inversify';
+import "reflect-metadata";
+import { TYPES } from './types';
 import Pin from './Pin';
 import cron from 'node-cron';
 import Channel from './Channel';
+import { inversifyConfig } from './inversify.config';
+import IStatus from './interfaces/IStatus';
+import IChannel from './interfaces/IChannel';
 
 class Controller {
 
     private static _controller: Controller;
+    private readonly coolChannel: IChannel;
+    private readonly warmChannel: IChannel;
     
     public static get instance(): Controller {
 
         if (!this._controller) {
-            this._controller = new Controller();
+            this._controller = new Controller(inversifyConfig);
         }
 
         return this._controller;
     }
 
-    private constructor(){ 
-        this.warmChannel = new Channel(Pin.WARM_WHITE);
-        this.coolChannel = new Channel(Pin.COOL_WHITE);
+    private constructor(container: Container){ 
+        
+        const channelConstructor = container.get<interfaces.Newable<IChannel>>(TYPES.IChannel)
+
+        this.warmChannel = new channelConstructor(Pin.WARM_WHITE);
+        this.coolChannel = new channelConstructor(Pin.COOL_WHITE);
     }
 
-    private readonly coolChannel: Channel;
-    private readonly warmChannel: Channel;
-
-    private getChannel(pin: Pin): Channel {
+    private getChannel(pin: Pin): IChannel {
         if (pin === Pin.COOL_WHITE) {
             return this.coolChannel;
         }else {
@@ -40,7 +46,7 @@ class Controller {
     private isSleeping: boolean = false;
     private isWaking: boolean = false;
     
-    public getStatus = () => {
+    public getStatus = (): IStatus => {
 
         return {
             ww: this.warmChannel.currentValuePct,
@@ -48,12 +54,14 @@ class Controller {
             weekendSchedule: this.scheduledTaskWeekend_time,
             weekdaySchedule: this.scheduledTaskWeekday_time,
             isSleeping: this.isSleeping,
+            isWaking: this.isWaking,
             version: "0.1.1"
         }
     }
 
-    public setPinValue = (pin: Pin, pct: number): Promise<any>  => {
-        return this.getChannel(pin).setValuePct(pct);
+    public setPinValue = (pin: Pin, pct: number): void  => {
+        const pinChannel = this.getChannel(pin)
+        pinChannel.setValuePct(pct);
     }
 
     public startSleep = () => {

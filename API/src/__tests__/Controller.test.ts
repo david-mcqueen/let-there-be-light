@@ -1,4 +1,11 @@
 import Controller from '../Controller';
+import Pin from '../Pin';
+import { stat } from 'fs';
+import IStatus from '../interfaces/IStatus';
+import { inversifyConfig } from '../inversify.config';
+import IChannel from '../interfaces/IChannel';
+import { TYPES } from '../types';
+import { Container } from 'inversify';
 
 jest.mock('node-cron', () => {
     return {
@@ -29,3 +36,18 @@ describe('Test Controller', () => {
         expect(waitTimeMs).toBe(expected);
     })
 })
+
+describe('Test IoC channels', () => {
+
+    beforeAll(() => {
+        process.env.NODE_ENV="test";
+    });
+
+    test('it has multiple instaces of the class', () => {
+        const controller =  Controller.instance;
+
+        controller.setPinValue(Pin.COOL_WHITE, 10)
+        const status: IStatus = controller.getStatus();
+        expect(status.cw).toBe(25);
+    });
+});

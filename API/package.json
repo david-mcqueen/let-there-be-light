@@ -27,8 +27,10 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "inversify": "^5.0.1",
     "jest": "^26.4.2",
     "node-cron": "^2.0.3",
+    "reflect-metadata": "^0.1.13",
     "ts-jest": "^26.3.0",
     "ts-loader": "^7.0.3",
     "webpack": "^4.43.0"
