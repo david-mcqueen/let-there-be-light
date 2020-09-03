@@ -150,27 +150,23 @@ class Controller {
 
         this.isSleeping = true;
 
-        const mins = 30;
-        const sec = mins * 60;
-        
+        const epochDelay = this.getWaitTimeMs(this.warmChannel.MaxValue)
+
         // We don't want the white light on at all during sleep mode
         this.coolChannel.setValue(0);
-        
-        // To get from the current value to 0 over 30 mins
-        const epochDelay = sec / this.warmChannel.MaxValue;
 
-        console.log(`epochDelay: ${epochDelay}`);
+        const intervalObj = setInterval(() => {
 
-        const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+            if (this.warmChannel.currentValue >= this.warmChannel.MaxValue){
+                this.isSleeping = false;
+                // console.log(`[]`);
+                clearInterval(intervalObj);
+            }
 
-        while (this.warmChannel.currentValue > 0 && this.isSleeping){
-            this.warmChannel.decrementBrightness();
-            await wait(epochDelay);
-        }
-
-        this.isSleeping = false;
-
-        console.log(`done`);
+            if (this.warmChannel.currentValue > 0){
+                this.warmChannel.decrementBrightness();
+            }
+        }, epochDelay);
     }
 }
 
