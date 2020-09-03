@@ -38,6 +38,7 @@ class Controller {
     private scheduledTaskWeekend: cron.ScheduledTask | undefined;
     private scheduledTaskWeekend_time: string = "";
     private isSleeping: boolean = false;
+    private isWaking: boolean = false;
     
     public getStatus = () => {
 
@@ -112,6 +113,11 @@ class Controller {
     }
 
     private async wakeUp() {
+        if (this.isWaking){
+            return;
+        }
+        this.isWaking = true;
+        
         // console.log("wakeUp");
 
         const epochDelay = this.getWaitTimeMs(this.warmChannel.MaxValue);
@@ -120,7 +126,9 @@ class Controller {
 
             if (this.warmChannel.currentValue >= this.warmChannel.MaxValue 
                 && this.coolChannel.currentValue >= this.coolChannel.MaxValue){
-                clearInterval(intervalObj);
+                
+                    this.isWaking = false;
+                    clearInterval(intervalObj);
             }
 
             // Warm Channel
