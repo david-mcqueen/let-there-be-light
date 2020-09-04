@@ -74,7 +74,7 @@ describe('Test sleep & Wake', () => {
 
         const pendingPromise = cnt.startSleep()
             .then(resolved => {
-                expect(wwSpy).toHaveBeenCalledTimes(255);
+                expect(wwSpy).toHaveBeenCalledTimes(200);
                 expect(cwSpy).toHaveBeenCalledTimes(1);
             })
 

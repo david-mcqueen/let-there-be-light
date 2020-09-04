@@ -7,7 +7,7 @@ import IChannel from "./interfaces/IChannel";
 class Channel implements IChannel {
     private _pin: Pin;
     private _currentValue: number; // The current set value of the channel
-    private _maxValue: number = 255;
+    private _maxValue: number = 200;
 
     public set currentValue(val: number) {
         this._currentValue = val;
