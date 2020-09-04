@@ -1,4 +1,5 @@
 import { injectable, inject } from 'inversify';
+import "reflect-metadata";
 import Pin from "./Pin";
 import exec from 'child_process';
 import IChannel from "./interfaces/IChannel";

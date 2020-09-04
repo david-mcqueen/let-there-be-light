@@ -74,7 +74,7 @@ describe('Test sleep & Wake', () => {
 
         const pendingPromise = cnt.startSleep()
             .then(resolved => {
-                expect(wwSpy).toHaveBeenCalledTimes(200);
+                expect(wwSpy).toHaveBeenCalledTimes(cnt.getChannel(Pin.WARM_WHITE).MaxValue);
                 expect(cwSpy).toHaveBeenCalledTimes(1);
             })
 
@@ -92,8 +92,8 @@ describe('Test sleep & Wake', () => {
 
         const pendingPromise = cnt.wakeUp()
             .then(resolved => {
-                expect(wwSpy).toHaveBeenCalledTimes(255);
-                expect(cwSpy).toHaveBeenCalledTimes(255);
+                expect(wwSpy).toHaveBeenCalledTimes(cnt.getChannel(Pin.WARM_WHITE).MaxValue);
+                expect(cwSpy).toHaveBeenCalledTimes(cnt.getChannel(Pin.COOL_WHITE).MaxValue);
             })
 
         jest.runAllTimers();
