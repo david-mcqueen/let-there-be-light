@@ -3,7 +3,13 @@ import { toast } from 'react-toastify';
 import Pin from "../enums/Pin";
 class ApiService {
 
-    private _url = `http://192.168.1.104:3000`
+    private _url: string;
+
+    constructor() {
+        const host = window.location.hostname;
+        this._url = `http://${host.indexOf('localhost') > -1 ? "192.168.1.121" : host}:3000`
+        console.log(this._url);
+    }
 
     public sleep = () => {
         return fetch(`${this._url}/sleep`, {

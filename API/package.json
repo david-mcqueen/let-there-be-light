@@ -4,9 +4,10 @@
   "description": "api for raspberry controlled sunlight",
   "main": "src/index.ts",
   "scripts": {
-    "build": "webpack && scp -r ../Scripts ./build",
+    "test": "jest --watch",
+    "build": "webpack",
     "build-prod": "webpack --mode=production --display-error-details",
-    "deploy": "scp -r ./build/ pi@192.168.1.104:~/sunrise-lamp/API",
+    "deploy": "scp ./build/index.js pi@192.168.1.121:~/sunrise-lamp/API/",
     "build-deploy": "npm run-script build && npm run-script deploy"
   },
   "author": "",
@@ -20,13 +21,38 @@
   "dependencies": {
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.6",
+    "@types/jest": "^26.0.13",
     "@types/moment-timezone": "^0.5.13",
     "@types/node-cron": "^2.0.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "inversify": "^5.0.1",
+    "jest": "^26.4.2",
     "node-cron": "^2.0.3",
+    "reflect-metadata": "^0.1.13",
+    "ts-jest": "^26.3.0",
     "ts-loader": "^7.0.3",
     "webpack": "^4.43.0"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "bower_components",
+      "shared"
+    ],
+    "moduleNameMapper": {
+      "^@root(.*)$": "<rootDir>/src$1",
+      "^@components(.*)$": "<rootDir>/src/components$1"
+    }
   }
 }

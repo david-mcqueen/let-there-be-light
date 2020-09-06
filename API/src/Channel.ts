@@ -1,7 +1,11 @@
+import { injectable, inject } from 'inversify';
+import "reflect-metadata";
 import Pin from "./Pin";
 import exec from 'child_process';
+import IChannel from "./interfaces/IChannel";
 
-class Channel {
+@injectable()
+class Channel implements IChannel {
     private _pin: Pin;
     private _currentValue: number; // The current set value of the channel
     private _maxValue: number = 200;
@@ -14,6 +18,10 @@ class Channel {
         return this._currentValue;
     }
 
+    public get MaxValue(): number {
+        return this._maxValue;
+    }
+
     public get currentValuePct() : number {
         return Math.floor((this._currentValue / this._maxValue) * 100);
     }
@@ -24,7 +32,7 @@ class Channel {
     }
 
     public incrementBrightness() {
-        if(this.currentValue < 255){
+        if(this.currentValue < this._maxValue){
             this.setValue(this.currentValue + 1);
         }
     }
@@ -38,7 +46,7 @@ class Channel {
 
     public setValuePct(pct: number): Promise<any> {
         
-        const value = Math.floor(this._maxValue * (pct / 100));
+        const value = Math.round(this._maxValue * (pct / 100));
         
         return this.setValue(value);
     }

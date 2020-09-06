@@ -1,31 +1,37 @@
-"use strict";
-
+import { injectable, inject, Container, interfaces } from 'inversify';
+import "reflect-metadata";
+import { TYPES } from './types';
 import Pin from './Pin';
 import cron from 'node-cron';
 import Channel from './Channel';
+import { inversifyConfig } from './inversify.config';
+import IStatus from './interfaces/IStatus';
+import IChannel from './interfaces/IChannel';
 
 class Controller {
 
     private static _controller: Controller;
+    private readonly coolChannel: IChannel;
+    private readonly warmChannel: IChannel;
     
     public static get instance(): Controller {
 
         if (!this._controller) {
-            this._controller = new Controller();
+            this._controller = new Controller(inversifyConfig);
         }
 
         return this._controller;
     }
 
-    private constructor(){ 
-        this.warmChannel = new Channel(Pin.WARM_WHITE);
-        this.coolChannel = new Channel(Pin.COOL_WHITE);
+    private constructor(container: Container){ 
+        
+        const channelConstructor = container.get<interfaces.Newable<IChannel>>(TYPES.IChannel)
+
+        this.warmChannel = new channelConstructor(Pin.WARM_WHITE);
+        this.coolChannel = new channelConstructor(Pin.COOL_WHITE);
     }
 
-    private readonly coolChannel: Channel;
-    private readonly warmChannel: Channel;
-
-    private getChannel(pin: Pin): Channel {
+    public getChannel(pin: Pin): IChannel {
         if (pin === Pin.COOL_WHITE) {
             return this.coolChannel;
         }else {
@@ -38,19 +44,24 @@ class Controller {
     private scheduledTaskWeekend: cron.ScheduledTask | undefined;
     private scheduledTaskWeekend_time: string = "";
     private isSleeping: boolean = false;
+    private isWaking: boolean = false;
     
-    public getStatus = () => {
+    public getStatus = (): IStatus => {
+
         return {
             ww: this.warmChannel.currentValuePct,
             cw: this.coolChannel.currentValuePct,
             weekendSchedule: this.scheduledTaskWeekend_time,
             weekdaySchedule: this.scheduledTaskWeekday_time,
-            isSleeping: this.isSleeping
+            isSleeping: this.isSleeping,
+            isWaking: this.isWaking,
+            version: "0.2.1"
         }
     }
 
-    public setPinValue = (pin: Pin, pct: number): Promise<any>  => {
-        return this.getChannel(pin).setValuePct(pct);
+    public setPinValuePct = (pin: Pin, pct: number): Promise<any>  => {
+        const pinChannel = this.getChannel(pin)
+        return pinChannel.setValuePct(pct);
     }
 
     public startSleep = () => {
@@ -98,67 +109,82 @@ class Controller {
             this.scheduledTaskWeekday.start();  
             this.scheduledTaskWeekday_time = time;
         }
-
     }
 
-    // Turns on the lights over a space of 30 mins
-    private async wakeUp() {
-        console.log("wakeUp");
-
-        const mins = 30;
-        const sec = mins * 60;
-        const maxValue = 255;
-        const midPoint = maxValue / 2;
+    public getWaitTimeMs(maxValue: number, durationMins: number = 30): number {
+        const sec = durationMins * 60;
         const epochDelay = sec / maxValue;
 
-        console.log(`epochDelay: ${epochDelay}`);
+        // console.log(`epochDelay: ${epochDelay}`);
 
-        const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+        return Math.round(epochDelay * 1000);
+    }
 
-        while (this.warmChannel.currentValue < maxValue || this.coolChannel.currentValue < maxValue){
-
-            this.warmChannel.incrementBrightness();
-
-            if (this.warmChannel.currentValue > midPoint){
-                // As we start at half way, increment twice so we get to the end at the same point
-                this.coolChannel.incrementBrightness();
-                this.coolChannel.incrementBrightness();
-            }
-
-            await wait(epochDelay);
+    public async wakeUp(): Promise<void> {
+        if (this.isWaking){
+            return;
         }
+        this.isWaking = true;
+        
+        // console.log("wakeUp");
 
-        console.log(`done`)
+        const epochDelay = this.getWaitTimeMs(this.warmChannel.MaxValue);
+
+        const warm = this.warmChannel;
+        const cool = this.coolChannel;
+
+        return new Promise<void> ((resolve, reject) => {
+            const intervalObj = setInterval(() => {
+    
+                if (warm.currentValue >= warm.MaxValue 
+                    && cool.currentValue >= cool.MaxValue){
+                    
+                        this.isWaking = false;
+                        clearInterval(intervalObj);
+                        resolve();
+                }
+
+                if (warm.currentValue < warm.MaxValue){
+                    warm.incrementBrightness();
+                    cool.incrementBrightness();
+                }
+    
+            }, epochDelay);
+        });
+
+        // console.log(`done`)
     }
 
     // Turns off the lights over a space of 30 mins
-    private async sleep() {
+    private async sleep(): Promise<void> {
         if (this.isSleeping){
             return;
         }
 
         this.isSleeping = true;
 
-        const mins = 30;
-        const sec = mins * 60;
-        
+        const epochDelay = this.getWaitTimeMs(this.warmChannel.currentValue)
+
         // We don't want the white light on at all during sleep mode
         this.coolChannel.setValue(0);
-        
-        // To get from the current value to 0 over 30 mins
-        const epochDelay = sec / this.warmChannel.currentValue;
 
-        console.log(`epochDelay: ${epochDelay}`);
+        const warm = this.warmChannel;
 
-        const wait = (seconds: number) => new Promise(resolve => setTimeout(resolve, seconds * 1000));
+        return new Promise<void> ((resolve, reject) => {
+            const intervalObj = setInterval(() => {
 
-        while (this.warmChannel.currentValue > 0 && this.isSleeping){
-            this.warmChannel.decrementBrightness();
-            await wait(epochDelay);
-        }
+                if (warm.currentValue <= 0){
+                    this.isSleeping = false;
+                    // console.log(`[]`);
+                    clearInterval(intervalObj);
+                    resolve();
+                }
 
-        this.isSleeping = false;
-        console.log(`done`);
+                if (warm.currentValue > 0){
+                    warm.decrementBrightness();
+                }
+            }, epochDelay);
+        });
     }
 }
 

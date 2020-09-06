@@ -1,0 +1,12 @@
+[Unit]
+Description=Sunlamp API Server Service
+After=network.target
+
+[Service]
+WorkingDirectory=/home/pi/sunrise-lamp/API
+ExecStart=node index.js
+Restart=on-failure
+User=pi
+
+[Install]
+WantedBy=multi-user.target
