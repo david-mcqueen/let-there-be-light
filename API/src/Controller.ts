@@ -163,7 +163,7 @@ class Controller {
 
         this.isSleeping = true;
 
-        const epochDelay = this.getWaitTimeMs(this.warmChannel.MaxValue)
+        const epochDelay = this.getWaitTimeMs(this.warmChannel.currentValue)
 
         // We don't want the white light on at all during sleep mode
         this.coolChannel.setValue(0);
