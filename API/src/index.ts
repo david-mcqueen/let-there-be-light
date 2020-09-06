@@ -5,6 +5,7 @@ import cors from 'cors';
 import Controller from './Controller';
 import bodyParser from 'body-parser';
 import Pin from './Pin';
+import Logger from './logger';
 
 
 const app = express();
@@ -13,6 +14,7 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.listen(3000, () => {
+    Logger.instance.info('[index.js] Server running');
  console.log("Server running on port 3000");
 });
 
@@ -25,17 +27,21 @@ app.get("/status", (req, res, next) => {
 })
 
 app.post("/sleep", (req, res, next) => {
+    Logger.instance.info('[index.js] Starting Sleep')
     Controller.instance.startSleep()
         .then((response: any) => {
+            Logger.instance.info('[index.js] Finished Sleep')
             res.json({success: true})
         })
         .catch((reason: any) => {
+            Logger.instance.info(`[index.js] Failed Sleep: ${reason}`)
             console.log(reason);
             res.json({success: false})
         })
 });
 
 app.post("/stopsleep", (req, res, next) => {
+    Logger.instance.info('[index.js] Stopping Sleep')
     Controller.instance.stopSleep()
     res.json({success: true})
 });
