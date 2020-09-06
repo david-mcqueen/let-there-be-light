@@ -128,7 +128,7 @@ class Controller {
         
         // console.log("wakeUp");
 
-        const epochDelay = this.getWaitTimeMs(this.warmChannel.currentValue);
+        const epochDelay = this.getWaitTimeMs(this.warmChannel.MaxValue);
 
         const warm = this.warmChannel;
         const cool = this.coolChannel;
