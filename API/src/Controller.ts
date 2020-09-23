@@ -56,7 +56,7 @@ class Controller {
             weekdaySchedule: this.scheduledTaskWeekday_time,
             isSleeping: this.isSleeping,
             isWaking: this.isWaking,
-            version: "0.2.2"
+            version: "0.2.3"
         }
     }
 
