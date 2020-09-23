@@ -45,6 +45,7 @@ class Controller {
     private scheduledTaskWeekend_time: string = "";
     private isSleeping: boolean = false;
     private isWaking: boolean = false;
+    private stopWaking: boolean = false;
     
     public getStatus = (): IStatus => {
 
@@ -55,11 +56,15 @@ class Controller {
             weekdaySchedule: this.scheduledTaskWeekday_time,
             isSleeping: this.isSleeping,
             isWaking: this.isWaking,
-            version: "0.2.1"
+            version: "0.2.3"
         }
     }
 
     public setPinValuePct = (pin: Pin, pct: number): Promise<any>  => {
+        if (pct == 0 && this.isWaking){
+            // The lamp was turned off whilst waking. Stop waking so that the lamp stays off
+            this.stopWaking = true;
+        }
         const pinChannel = this.getChannel(pin)
         return pinChannel.setValuePct(pct);
     }
@@ -135,11 +140,19 @@ class Controller {
 
         return new Promise<void> ((resolve, reject) => {
             const intervalObj = setInterval(() => {
+
+                if (this.stopWaking){
+                    this.stopWaking = false;
+                    this.isWaking = false;
+                    clearInterval(intervalObj);
+                    resolve();
+                }
     
                 if (warm.currentValue >= warm.MaxValue 
                     && cool.currentValue >= cool.MaxValue){
                     
                         this.isWaking = false;
+                        this.stopWaking = false;
                         clearInterval(intervalObj);
                         resolve();
                 }

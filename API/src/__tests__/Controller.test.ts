@@ -13,7 +13,7 @@ jest.mock('node-cron', () => {
     };
   });
 
-describe('Test Controller', () => {
+describe('Test getWaitTimeMs', () => {
 
     // Test that the correct wait is returned for a given value
     test.each`
@@ -58,23 +58,52 @@ describe('Test sleep & Wake', () => {
     jest.useFakeTimers();
 
     let cnt: Controller;
+    let cwSpy: jest.SpyInstance<Promise<any>, [Number]>;
+    let wwSpy: jest.SpyInstance<void, []>;
 
     beforeAll(() => {
         process.env.NODE_ENV="test";
         cnt = Controller.instance;
     })
 
+    beforeEach(() => {
+        cwSpy = jest.spyOn(cnt.getChannel(Pin.COOL_WHITE), 'setValue' );
+        wwSpy = jest.spyOn(cnt.getChannel(Pin.WARM_WHITE), 'decrementBrightness' );
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        cwSpy.mockClear();
+        wwSpy.mockClear();
+    })
+
     test('sleep from max value', () => {
         cnt.setPinValuePct(Pin.COOL_WHITE, 100);
         cnt.setPinValuePct(Pin.WARM_WHITE, 100);
 
-        const cwSpy = jest.spyOn(cnt.getChannel(Pin.COOL_WHITE), 'setValue' );
-        const wwSpy = jest.spyOn(cnt.getChannel(Pin.WARM_WHITE), 'decrementBrightness' );
-        
+        cwSpy.mockClear();
 
         const pendingPromise = cnt.startSleep()
             .then(resolved => {
                 expect(wwSpy).toHaveBeenCalledTimes(cnt.getChannel(Pin.WARM_WHITE).MaxValue);
+                expect(cwSpy).toHaveBeenCalledTimes(1);
+            })
+
+        jest.runAllTimers();
+        
+        return pendingPromise;
+    })
+
+    test('sleep from mid value', () => {
+        cnt.setPinValuePct(Pin.COOL_WHITE, 50);
+        cnt.setPinValuePct(Pin.WARM_WHITE, 50);
+
+        cwSpy.mockClear();
+
+        const pendingPromise = cnt.startSleep()
+            .then(resolved => {
+                expect(wwSpy).toHaveBeenCalledTimes(cnt.getChannel(Pin.WARM_WHITE).MaxValue / 2);
+                expect(setInterval).toHaveBeenCalledTimes(1);
                 expect(cwSpy).toHaveBeenCalledTimes(1);
             })
 
