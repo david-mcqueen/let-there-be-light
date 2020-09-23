@@ -5,7 +5,7 @@ import cors from 'cors';
 import Controller from './Controller';
 import bodyParser from 'body-parser';
 import Pin from './Pin';
-import Logger from './logger';
+import Logger from './Logger';
 
 
 const app = express();
@@ -55,12 +55,14 @@ app.post("/setSchedule", (req, res, next) => {
         return;
     }
 
+    Logger.instance.info(`Setting Schedule. Time: ${schedule}. Part: ${part}`);
+
     try {
         Controller.instance.setAlarmSchedule(schedule, part);
         res.json({success: true});
     }
     catch(e) {
-        console.log(e);
+        Logger.instance.info(`Failed to set schedule. Time: ${schedule}. Part: ${part}. Reason ${e}`);
         res.json({success: false});
     }
 })

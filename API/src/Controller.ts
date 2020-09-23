@@ -7,6 +7,7 @@ import Channel from './Channel';
 import { inversifyConfig } from './inversify.config';
 import IStatus from './interfaces/IStatus';
 import IChannel from './interfaces/IChannel';
+import Logger from './Logger';
 
 class Controller {
 
@@ -130,8 +131,6 @@ class Controller {
             return;
         }
         this.isWaking = true;
-        
-        // console.log("wakeUp");
 
         const epochDelay = this.getWaitTimeMs(this.warmChannel.MaxValue);
 
@@ -142,6 +141,7 @@ class Controller {
             const intervalObj = setInterval(() => {
 
                 if (this.stopWaking){
+                    Logger.instance.info("Stopping Sleep");
                     this.stopWaking = false;
                     this.isWaking = false;
                     clearInterval(intervalObj);
@@ -164,8 +164,6 @@ class Controller {
     
             }, epochDelay);
         });
-
-        // console.log(`done`)
     }
 
     // Turns off the lights over a space of 30 mins
@@ -188,7 +186,6 @@ class Controller {
 
                 if (warm.currentValue <= 0){
                     this.isSleeping = false;
-                    // console.log(`[]`);
                     clearInterval(intervalObj);
                     resolve();
                 }
